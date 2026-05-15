@@ -1,0 +1,2 @@
+User-agent: *
+Disallow: /nazwa-pliku-ktory-chcesz-ukryć.html
