@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Tagi SEO dla Google, żeby strona wskoczyła pod frazę Radio Pro v15 -->
+    <title>Radio Pro v15 - Darmowe Radio Internetowe Bez Reklam</title>
+    <meta name="description" content="Słuchaj ulubionych stacji radiowych online za darmo i bez reklam. Dodawaj stacje do ulubionych w aplikacji Radio Pro v15.">
+    
+    <!-- Ikony FontAwesome do gwiazdek, radia i przycisku play -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* DOKŁADNY DESIGN Z TWOJEGO SCREENA (image_2.png) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0b0c10; /* Bardzo ciemne, głębokie tło */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background-color: #12131c; /* Kolor Twojego panelu głównego */
+            border-radius: 40px;
+            padding: 30px 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid #1a1c29;
+        }
+
+        /* Sekcja Player */
+        .player-section {
+            text-align: center;
+            padding: 10px 0 20px 0;
+        }
+
+        .radio-icon-box {
+            width: 110px;
+            height: 110px;
+            background-color: #1c1e2a;
+            border-radius: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px auto;
+            border: 1px solid #252838;
+        }
+
+        .main-radio-icon {
+            font-size: 50px;
+            color: #d1d4e0;
+        }
+
+        .status-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            font-size: 30px;
+            color: #0b0c10;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px auto;
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+            transition: transform 0.1s;
+        }
+
+        .play-button:active {
+            transform: scale(0.93);
+        }
+
+        /* Suwak głośności z Twojego screena */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 85%;
+            margin: 0 auto;
+        }
+
+        .volume-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 5px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #007aff 0%, #007aff 50%, #252838 50%, #252838 100%);
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background: #1c1e2a;
+            margin: 25px 0;
+        }
+
+        /* Wyszukiwarka z Twojego screena z napisem OK */
+        .search-section {
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            display: flex;
+            background-color: #171923;
+            border-radius: 16px;
+            border: 1px solid #222637;
+            padding: 4px 20px;
+            align-items: center;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #ffffff;
+            padding: 12px 0;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: #4e536e;
+        }
+
+        .search-ok-button {
+            background: none;
+            border: none;
+            color: #007aff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            padding-left: 10px;
+        }
+
+        /* Napisy sekcji - Twój jasnoniebieski kolor! */
+        .section-title {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            color: #007aff; /* Twój niebieski kolor MY FAVORITES i RESULTS */
+        }
+
+        .stations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        /* Kafelki stacji z zaokrąglonymi rogami ze zrzutu ekranu */
+        .station-item {
+            display: flex;
+            align-items: center;
+            background-color: #1c1e2a;
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid #222637;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .station-item:hover {
+            background-color: #232738;
+        }
+
+        .station-icon-mini {
+            width: 42px;
+            height: 42px;
+            background-color: #292d3f;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+            color: #d1d4e0;
+            font-size: 18px;
+        }
+
+        .station-name {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Gwiazdki ulubionych */
+        .star-icon {
+            color: #2d3147; /* Ciemna gwiazdka gdy nieaktywna */
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-icon.active {
+            color: #007aff; /* Podświetla się na Twój niebieski kolor! */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Główny odtwarzacz (Player) -->
+        <div class="player-section">
+            <div class="radio-icon-box">
+                <i class="fa-solid fa-radio main-radio-icon"></i>
+            </div>
+            
+            <h1 id="current-status" class="status-title">Ready to play</h1>
+            
+            <button id="play-btn" class="play-button">
+                <i class="fa-solid fa-play" id="play-icon"></i>
+            </button>
+            
+            <!-- Suwak głośności -->
+            <div class="volume-container">
+                <input type="range" id="volume-slider" min="0" max="100" value="80" class="volume-slider">
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Wyszukiwarka stacji -->
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button id="search-ok-btn" class="search-ok-button">OK</button>
+            </div>
+        </div>
+
+        <!-- Sekcja Ulubionych stacji (MY FAVORITES) -->
+        <div class="favorites-section">
+            <h2 class="section-title">MY FAVORITES ★</h2>
+            <div id="favorites-list" class="stations-list">
+                <!-- Tu wpadną gwiazdki z localStorage -->
+            </div>
+        </div>
+
+        <!-- Sekcja Wszystkich Wyników (RESULTS) -->
+        <div class="results-section">
+            <h2 class="section-title">RESULTS</h2>
+            <div id="results-list" class="stations-list">
+                
+                <!-- Stacja 1 -->
+                <div class="station-item" data-stream="https://pldscenter.ssl.cdn.cra.cz/icecast/rmf30lat128.mp3" data-id="rmf30">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">Radio 30 lat RMF FM</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'rmf30')"></i>
+                </div>
+
+                <!-- Stacja 2 -->
+                <div class="station-item" data-stream="https://stream.radioalex.pl:8443/alex" data-id="alex">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">RADIO ALEX / RMF ON</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'alex')"></i>
+                </div>
+
+                <!-- Stacja 3 -->
+                <div class="station-item" data-stream="https://ch01.ssl.cdn.cra.cz/rmf_fm" data-id="rmffm">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">Radio RMF FM</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'rmffm')"></i>
+                </div>
+
+                <!-- Stacja 4 -->
+                <div class="station-item" data-stream="https://pldscenter.ssl.cdn.cra.cz/icecast/rmf2000128.mp3" data-id="rmf2000">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">Radio RMF - 2000</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'rmf2000')"></i>
+                </div>
+
+                <!-- Stacja 5 -->
+                <div class="station-item" data-stream="https://pldscenter.ssl.cdn.cra.cz/icecast/rmf80disco128.mp3" data-id="rmf80">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">Radio RMF - 80s Disco</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'rmf80')"></i>
+                </div>
+
+                <!-- Stacja 6 -->
+                <div class="station-item" data-stream="https://ch02.ssl.cdn.cra.cz/radio_zet" data-id="zet">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">Radio ZET</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'zet')"></i>
+                </div>
+
+                <!-- Stacja 7 -->
+                <div class="station-item" data-stream="https://pldscenter.ssl.cdn.cra.cz/icecast/eska128.mp3" data-id="eska">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">Radio ESKA</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'eska')"></i>
+                </div>
+
+                <!-- Stacja 8 -->
+                <div class="station-item" data-stream="https://stream.bigfm.de/bigfm/mp3-128/stream.bigfm.de/" data-id="bigfm">
+                    <div class="station-icon-mini"><i class="fa-solid fa-radio"></i></div>
+                    <div class="station-name">bigFM (Deutschland)</div>
+                    <i class="fa-solid fa-star star-icon" onclick="toggleFavorite(event, 'bigfm')"></i>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Ukryty odtwarzacz audio -->
+    <audio id="audio-player"></audio>
+
+    <script>
+        // LOGIKA PROGRAMU (Działa bez przeładowania)
+        const audio = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const statusText = document.getElementById('current-status');
+        const volumeSlider = document.getElementById('volume-slider');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-ok-btn');
+        const stationItems = document.querySelectorAll('.station-item');
+        
+        let currentStream = "";
+        let isPlaying = false;
+
+        // Dynamiczna linia podgłaśniania na suwaku
+        function updateVolumeBackground(val) {
+            volumeSlider.style.background = `linear-gradient(to right, #007aff 0%, #007aff ${val}%, #252838 ${val}%, #252838 100%)`;
+        }
+        updateVolumeBackground(80);
+
+        // Wybieranie stacji z listy
+        stationItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if(e.target.classList.contains('star-icon')) return;
+
+                currentStream = this.getAttribute('data-stream');
+                const stationName = this.querySelector('.station-name').innerText;
+                
+                audio.src = currentStream;
+                audio.play();
+                isPlaying = true;
+                playIcon.className = "fa-solid fa-pause";
+                statusText.innerText = stationName;
+            });
+        });
+
+        // Obsługa Play/Pause
+        playBtn.addEventListener('click', () => {
+            if(!currentStream && stationItems.length > 0) {
+                stationItems[0].click();
+                return;
+            }
+            if(isPlaying) {
+                audio.pause();
+                playIcon.className = "fa-solid fa-play";
+                isPlaying = false;
+            } else {
+                audio.play();
+                playIcon.className = "fa-solid fa-pause";
+                isPlaying = true;
+            }
+        });
+
+        // Obsługa głośności i wyglądu paska
+        volumeSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            audio.volume = val / 100;
+            updateVolumeBackground(val);
+        });
+
+        // Wyszukiwanie stacji (Przycisk OK)
+        function runSearch() {
+            const query = searchInput.value.toLowerCase();
+            stationItems.forEach(item => {
+                const name = item.querySelector('.station-name').innerText.toLowerCase();
+                if(name.includes(query)) {
+                    item.style.display = "flex";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
+        searchBtn.addEventListener('click', runSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') runSearch();
+        });
+
+        // Ulubione stacje w localStorage
+        let favorites = JSON.parse(localStorage.getItem('radio_favorites')) || [];
+
+        function updateFavoritesUI() {
+            const favList = document.getElementById('favorites-list');
+            favList.innerHTML = "";
+            
+            document.querySelectorAll('.star-icon').forEach(star => star.classList.remove('active'));
+
+            favorites.forEach(favId => {
+                const originalItem = document.querySelector(`[data-id="${favId}"]`);
+                if(originalItem) {
+                    originalItem.querySelector('.star-icon').classList.add('active');
+                    
+                    const clone = originalItem.cloneNode(true);
+                    clone.addEventListener('click', function(e) {
+                        if(e.target.classList.contains('star-icon')) {
+                            toggleFavorite(e, favId);
+                            return;
+                        }
+                        originalItem.click();
+                    });
+                    favList.appendChild(clone);
+                }
+            });
+        }
+
+        function toggleFavorite(event, id) {
+            event.stopPropagation();
+            const index = favorites.indexOf(id);
+            if(index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('radio_favorites', JSON.stringify(favorites));
+            updateFavoritesUI();
+        }
+
+        document.addEventListener("DOMContentLoaded", updateFavoritesUI);
+    </script>
+</body>
+</html>
