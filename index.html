@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Pro v15</title>
+    
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#23272a">
+
+    <style>
+        :root {
+            --bg-color: #23272a;
+            --card-bg: #2c2f33;
+            --text-color: #ffffff;
+            --accent-color: #7289da;
+        }
+
+        body.light-mode {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #007bff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .controls-top {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--accent-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-grow: 1;
+            max-width: 300px;
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .card.playing {
+            border: 2px solid var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(114, 137, 218, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(114, 137, 218, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(114, 137, 218, 0); }
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Ukryty blok ze słowami kluczowymi i literówkami dla wyszukiwarki Google */
+        .seo-keywords {
+            display: none;
+            visibility: hidden;
+            height: 0;
+            width: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Radio Pro v15 📻</h1>
+
+    <div class="controls-top">
+        <button class="btn" id="theme-toggle">🌓 Tryb</button>
+        <button class="btn" id="stop-btn">🛑 Stop</button>
+        <div class="volume-container">
+            <span>🔊</span>
+            <input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.01" value="0.5">
+        </div>
+    </div>
+
+    <div class="grid" id="radio-grid"></div>
+
+    <audio id="audio-player" preload="none"></audio>
+
+    <div class="seo-keywords">
+        radio pro v15, radio prov15, radio pro, radio15, radioprov, radjo pro 15, radjo pro v15, radjopro, polskie radio, internetowe radio, stacje radiowe, radio na telefon, rmf fm, eska, vox fm, rpr1, swr3, bigfm, radio online, darmowe radio, pwa radio app.
+    </div>
+
+    <script>
+        const stations = [
+            { name: "RMF FM", url: "https://r.orastream.srv.fluidstream.eu/RMF-FM.mp3", icon: "🎵" },
+            { name: "Radio Zet", url: "https://r.orastream.srv.fluidstream.eu/Radio-Zet.mp3", icon: "🔴" },
+            { name: "Eska", url: "https://waw01-01.ic.smcdn.pl/2120-1.mp3", icon: "🔥" },
+            { name: "Vox FM", url: "https://waw01-01.ic.smcdn.pl/2330-1.mp3", icon: "🕺" },
+            { name: "RMF MAXX", url: "https://r.orastream.srv.fluidstream.eu/RMF-MAXX.mp3", icon: "⚡" },
+            { name: "Złote Przeboje", url: "https://mainstream.radioagora.pl/tuba9-1.mp3", icon: "📀" },
+            { name: "SWR3", url: "https://swr-swr3-live.cast.addradio.de/swr/swr3/live/mp3/128/stream.mp3", icon: "🇩🇪" },
+            { name: "RPR1", url: "https://rpr1.streamabc.zone/rpr1-sub01-mp3-128-4444901", icon: "🍇" },
+            { name: "bigFM", url: "https://bigfm.streamabc.zone/bigfm-mp3-128-3605670", icon: "🔊" }
+        ];
+
+        const grid = document.getElementById('radio-grid');
+        const player = document.getElementById('audio-player');
+        const stopBtn = document.getElementById('stop-btn');
+        const volumeSlider = document.getElementById('volume');
+        const themeToggle = document.getElementById('theme-toggle');
+        let currentCard = null;
+
+        // Budowanie stacji radiowych w panelu
+        stations.forEach(station => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<span class="icon">${station.icon}</span><span class="name">${station.name}</span>`;
+            
+            card.addEventListener('click', () => {
+                if (currentCard === card) {
+                    if (!player.paused) {
+                        player.pause();
+                        card.classList.remove('playing');
+                    } else {
+                        player.play().catch(err => console.log("Błąd odtwarzania:", err));
+                        card.classList.add('playing');
+                    }
+                    return;
+                }
+
+                if (currentCard) currentCard.classList.remove('playing');
+                
+                player.src = station.url;
+                player.play()
+                    .then(() => {
+                        card.classList.add('playing');
+                        currentCard = card;
+                    })
+                    .catch(err => {
+                        alert("Nie udało się załadować strumienia stacji.");
+                        console.error(err);
+                    });
+            });
+
+            grid.appendChild(card);
+        });
+
+        // Obsługa przycisku Stop
+        stopBtn.addEventListener('click', () => {
+            player.pause();
+            player.src = ""; 
+            if (currentCard) {
+                currentCard.classList.remove('playing');
+                currentCard = null;
+            }
+        });
+
+        // Płynna regulacja głośności
+        volumeSlider.addEventListener('input', (e) => {
+            player.volume = e.target.value;
+        });
+
+        // Przełączanie motywu (Jasny / Ciemny)
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+
+        // Automatyczna rejestracja Service Workera dla aplikacji PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker zarejestrowany pomyślnie!', reg.scope))
+                    .catch(err => console.log('Błąd rejestracji Service Workera:', err));
+            });
+        }
+    </script>
+</body>
+</html>
