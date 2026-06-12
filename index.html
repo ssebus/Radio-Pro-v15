@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Radio Pro v15 - Official Application Website</title>
+    <meta name="description" content="Official website of Radio Pro v15. Listen to your favorite radio stations online for free and without ads on any device. RadioPro 15, Radio Pro V.">
+    <meta name="keywords" content="Radio Pro v15, internet radio, radio pro, v15, Radio Pro 15, RadioPro15, RadioPro v15, Radio Pro V, radioprov, radio pro, radio v15, radio15, radjo pro, radio pro piętnaście, radiopro, radjo pro 15, radio pro v 15, radio pto, radjo pto, radio pro w15, radio pro15">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%231a1a2e%22 rx=%2220%22/><text x=%225%22 y=%2280%22 font-size=%2280%22>📻</text></svg>">
+
+    <style>
+        :root { --bg: #050508; --accent: #007aff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, system-ui, sans-serif; }
+        body { background: var(--bg); background: radial-gradient(circle at 20% 20%, #1a1a2e 0%, #050508 100%); min-height: 100vh; width: 100vw; display: flex; align-items: flex-start; justify-content: center; color: white; padding: 15px 5px; overflow-y: auto; }
+        .window { width: 100%; height: auto; max-width: 500px; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: max-width 0.3s ease, height 0.3s ease; position: relative; }
+        
+        .window.expanded-mode { max-width: 650px; margin-top: 10vh; }
+        .window.expanded-mode .player { padding: 40px 20px; }
+        .window.expanded-mode .icon-box { width: 140px; height: 140px; }
+        .window.expanded-mode .icon-box img, .window.expanded-mode .icon-box .emoji-fallback { font-size: 70px; }
+        .window.expanded-mode #curName { font-size: 1.8rem; margin-bottom: 15px; }
+        .window.expanded-mode .sidebar { display: none !important; }
+
+        .size-toggle-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.2s; margin-top: 5px; }
+        .size-toggle-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .player { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: relative; }
+        #viz { width: 100%; height: 50px; }
+        
+        .icon-box { width: 90px; height: 90px; background: rgba(255,255,255,0.03); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; overflow: hidden; }
+        .icon-box img { width: 100%; height: 100%; object-fit: cover; }
+        .icon-box .emoji-fallback { font-size: 45px; }
+
+        .play-btn { width: 65px; height: 65px; background: white; color: black; border-radius: 50%; border: none; font-size: 22px; cursor: pointer; margin-bottom: 10px; }
+        .sidebar { flex: 1; background: rgba(0,0,0,0.2); display: flex; flex-direction: column; padding: 15px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .search-area { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 8px; display: flex; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .search-area input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 14px; }
+        .list-container { flex: 1; }
+        .section-title { font-size: 10px; color: var(--accent); font-weight: 800; margin: 12px 0 6px 0; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .item { padding: 10px; background: rgba(255,255,255,0.12); margin-bottom: 5px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; border: 1px solid transparent; }
+        .item.playing-now { background: rgba(0, 122, 255, 0.35) !important; border-color: var(--accent); font-weight: bold; }
+        
+        .item-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,0.05); }
+        .item-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+        .star { margin-left: auto; color: rgba(255,255,255,0.15); font-size: 24px; padding: 5px; }
+        .star.active { color: #ffcc00; transform: scale(1.1); }
+        
+        .volume-container { display: flex; align-items: center; gap: 12px; margin-top: 8px; min-height: 32px; }
+        .vol-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: white; font-size: 16px; font-weight: bold; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; transition: background 0.2s; }
+        .vol-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        input[type="range"] { width: 130px; accent-color: var(--accent); cursor: pointer; }
+        
+        .ios-notice-container { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .ios-notice { font-size: 12px; color: #ffffff; font-weight: 700; letter-spacing: 0.5px; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); display: inline-block; z-index: 2; }
+        .ios-disabled-slider { width: 80px; opacity: 0.25; cursor: not-allowed; pointer-events: none; accent-color: var(--accent); }
+
+        .welcome-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .welcome-box { background: #1a1a2e; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; max-width: 400px; width: 100%; padding: 25px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .welcome-box h3 { font-size: 1.4rem; margin-bottom: 12px; color: var(--accent); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .welcome-box p { font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+        .welcome-box ol { text-align: left; margin: 15px 0 20px 20px; color: rgba(255,255,255,0.9); font-size: 0.9rem; }
+        .welcome-box ol li { margin-bottom: 8px; }
+        .welcome-btn { background: white; color: black; border: none; padding: 10px 30px; font-weight: bold; border-radius: 25px; cursor: pointer; font-size: 1rem; transition: transform 0.2s; width: 100%; }
+        .welcome-btn:hover { transform: scale(1.03); }
+    </style>
+</head>
+<body>
+    <h1 style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Radio Pro v15</h1>
+
+    <div class="welcome-overlay" id="welcomeScreen" style="display: none;">
+        <div class="welcome-box">
+            <h3>📻 Radio Pro v15</h3>
+            <p>Welcome to the official application! Here is a quick guide on how to listen:</p>
+            <ol>
+                <li>Use the <b>Search</b> bar to find your favorite radio stations.</li>
+                <li>Click on any station from the list to start playing.</li>
+                <li>Tap the <b>★ star</b> icon to save stations to your Favorites.</li>
+                <li>Use the <b>⤢ button</b> under the visualizer to expand the view!</li>
+            </ol>
+            <button class="welcome-btn" onclick="closeWelcome()">OK</button>
+        </div>
+    </div>
+
+    <div class="window" id="appWindow">
+        <div class="player">
+            <canvas id="viz"></canvas>
+            
+            <button class="size-toggle-btn" onclick="toggleLayoutSize()" title="Toggle Compact View">⤢</button>
+
+            <div class="icon-box" id="mainIconBox"><span class="emoji-fallback">📻</span></div>
+            
+            <h2 id="curName" style="font-size: 1.2rem; margin-bottom: 5px; text-align: center;">Ready to play</h2>
+            <button class="play-btn" id="pBtn" onclick="togglePlay()">▶</button>
+            
+            <div class="volume-container" id="volControl">
+                <button class="vol-btn" onclick="changeVolumeStep(-0.05)">−</button>
+                <input type="range" id="volSlider" min="0" max="1" step="0.01" value="0.8">
+                <button class="vol-btn" onclick="changeVolumeStep(0.05)">+</button>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="search-area">
+                <input type="text" id="sIn" placeholder="Search..." onkeypress="if(event.key==='Enter') search()">
+                <button onclick="search()" style="background:none; border:none; color:var(--accent); font-weight:bold; cursor:pointer; padding: 0 5px;">OK</button>
+            </div>
+            <div class="list-container">
+                <div class="section-title">MY FAVORITES ★</div>
+                <div id="favList"></div>
+                <div class="section-title" id="mainListTitle">DETECTING LOCATION... 📍</div>
+                <div id="resList"></div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio" playsinline preload="auto"></audio>
+
+    <div style="position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
+        <h2>Wyszukiwania powiązane z Radio Pro v15:</h2>
+        <p>Oficjalna strona aplikacji Radio Pro v15. Szukasz Radio Pro 15, RadioPro15, lub RadioPro v15? Tutaj znajdziesz radio internetowe stabilne i szybkie.</p>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const pBtn = document.getElementById('pBtn');
+        const canvas = document.getElementById('viz');
+        const ctx = canvas.getContext('2d');
+        const volSlider = document.getElementById('volSlider');
+        let favs = JSON.parse(localStorage.getItem('RADIO_STATIONS_FINAL')) || [];
+        let currentStationUuid = null;
+        let currentStationName = "Radio Pro v15";
+        let currentStationFavicon = "";
+
+        audio.volume = volSlider.value;
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        
+        if (isIOS) {
+            document.getElementById('volControl').innerHTML = `
+                <div class="ios-notice-container">
+                    <span class="ios-notice">Use phone volume buttons 📱</span>
+                    <input type="range" class="ios-disabled-slider" min="0" max="1" value="0.8" disabled>
+                </div>
+            `;
+        }
+
+        function checkWelcomeMessage() {
+            const hasSeen = localStorage.getItem('hasSeenRadioWelcomeV15');
+            if (!hasSeen) document.getElementById('welcomeScreen').style.display = 'flex';
+        }
+
+        document.getElementById('welcomeScreen').onclick = function(e) {
+            if(e.target === this) closeWelcome();
+        };
+
+        function closeWelcome() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            localStorage.setItem('hasSeenRadioWelcomeV15', 'true');
+        }
+
+        function toggleLayoutSize() {
+            const win = document.getElementById('appWindow');
+            win.classList.toggle('expanded-mode');
+            setTimeout(() => {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                drawStaticLine();
+            }, 300);
+        }
+
+        function updateMediaSession(name, iconUrl) {
+            if ('mediaSession' in navigator) {
+                const artworkUrl = (iconUrl && iconUrl.trim() !== '') ? iconUrl : 'https://cdn-icons-png.flaticon.com/512/651/651717.png';
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: name,
+                    artist: "Radio Pro v15",
+                    album: "Live Radio 📻",
+                    artwork: [{ src: artworkUrl, sizes: '512x512', type: 'image/png' }]
+                });
+                navigator.mediaSession.playbackState = 'playing';
+            }
+        }
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', () => { togglePlay(); });
+            navigator.mediaSession.setActionHandler('pause', () => { togglePlay(); });
+        }
+
+        function drawStaticLine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath(); 
+            ctx.strokeStyle = '#007aff'; 
+            ctx.lineWidth = 3;
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+
+        // UNIKALNOŚĆ I JAKOŚĆ STRUMIENI
+        function filterBestStations(stations) {
+            const uniqueMap = new Map();
+            stations.sort((a, b) => (b.clickcount || 0) - (a.clickcount || 0));
+
+            for (const s of stations) {
+                if (!s.url || s.url.trim() === '') continue;
+                const cleanName = s.name.trim().toLowerCase();
+
+                if (!uniqueMap.has(cleanName)) {
+                    uniqueMap.set(cleanName, s);
+                } else {
+                    const existing = uniqueMap.get(cleanName);
+                    if ((s.bitrate || 0) > (existing.bitrate || 0)) {
+                        uniqueMap.set(cleanName, s);
+                    }
+                }
+            }
+            return Array.from(uniqueMap.values());
+        }
+
+        // UTWORZENIE PRAWDZIWEJ, SPRAWDZONEJ LISTY TOP HITÓW DLA TWOJEGO REGIONU
+        function getPremiumVerifiedStations(country, region) {
+            const cCode = country ? country.toUpperCase() : "";
+            const rLower = region ? region.toLowerCase() : "";
+
+            // Sprawdzamy czy użytkownik jest w Niemczech w regionie Rheinland-Pfalz / Bad Breisig
+            if (cCode === "DE" || rLower.includes("pfalz") || rLower.includes("rheinland")) {
+                return [
+                    { name: "Radio RPR1. (Rheinland-Pfalz)", url: "https://stream.rpr1.de/rpr1/mp3-128/stream.rpr1.de/", stationuuid: "premium-rpr1", favicon: "https://www.rpr1.de/favicon.ico", clickcount: 9999, bitrate: 128 },
+                    { name: "Bitafon Radio", url: "https://stream.bitafon.de/live.mp3", stationuuid: "premium-bitafon", favicon: "", clickcount: 9998, bitrate: 192 },
+                    { name: "SWR3 (Pop & Hits)", url: "https://swr-swr3-live.cast.addradio.de/swr/swr3/live/mp3/128/stream.mp3", stationuuid: "premium-swr3", favicon: "https://www.swr3.de/favicon.ico", clickcount: 9997, bitrate: 128 },
+                    { name: "BigFM (Hot Music Radio)", url: "https://stream.bigfm.de/bigfm/mp3-128/stream.bigfm.de/", stationuuid: "premium-bigfm", favicon: "https://www.bigfm.de/favicon.ico", clickcount: 9996, bitrate: 128 },
+                    { name: "Radio RPR2", url: "https://stream.rpr1.de/rpr2/mp3-128/stream.rpr1.de/", stationuuid: "premium-rpr2", favicon: "", clickcount: 9995, bitrate: 128 },
+                    { name: "WDR 1LIVE", url: "https://wdr-1live-live.cast.addradio.de/wdr/1live/live/mp3/128/stream.mp3", stationuuid: "premium-1live", favicon: "", clickcount: 9994, bitrate: 128 }
+                ];
+            }
+            
+            // Sprawdzamy czy użytkownik jest w Polsce (np. Kraków / Małopolska)
+            if (cCode === "PL" || rLower.includes("malopolskie") || rLower.includes("krakow")) {
+                return [
+                    { name: "RMF FM (Kraków/Polska)", url: "https://player.rmf24.pl/stream.mp3", stationuuid: "premium-rmffm", favicon: "https://www.rmf.fm/favicon.ico", clickcount: 9999, bitrate: 128 },
+                    { name: "Radio ZET", url: "https://zet-net-01.cdn.eurozet.pl/zet.mp3", stationuuid: "premium-radiozet", favicon: "https://www.radiozet.pl/favicon.ico", clickcount: 9995, bitrate: 128 },
+                    { name: "RMF MAXX", url: "https://player.rmfmaxx.pl/stream.mp3", stationuuid: "premium-rmfmaxx", favicon: "", clickcount: 9990, bitrate: 128 },
+                    { name: "Eska Kraków", url: "https://waw01.ic.smcdn.pl/2100-1.mp3", stationuuid: "premium-eska", favicon: "https://www.eska.pl/favicon.ico", clickcount: 9985, bitrate: 128 },
+                    { name: "Radio Kraków", url: "https://stream4.nadaje.com:8010/radiokrakow", stationuuid: "premium-rkrakow", favicon: "", clickcount: 9980, bitrate: 128 },
+                    { name: "Antyradio", url: "https://ant-net-01.cdn.eurozet.pl/ant.mp3", stationuuid: "premium-antyradio", favicon: "", clickcount: 9975, bitrate: 128 }
+                ];
+            }
+
+            return []; // Jeśli to inny zakątek świata, pociągnie dynamiczne API
+        }
+
+        // CENTRALNY SYSTEM STEROWANIA LOKALIZACJĄ
+        async function loadInitialLocationStations() {
+            try {
+                const ipRes = await fetch('https://ipapi.co/json/');
+                const ipData = await ipRes.json();
+                
+                const countryCode = ipData.country_code; 
+                const regionName = ipData.region;       
+                const displayLocation = ipData.city || ipData.region || ipData.country_name;
+
+                document.getElementById('mainListTitle').innerText = `POPULAR IN ${displayLocation.toUpperCase()} 📍`;
+
+                // Krok 1: Sprawdź czy mamy ręcznie zweryfikowaną paczkę prawdziwych hitów dla tego regionu
+                let stations = getPremiumVerifiedStations(countryCode, regionName);
+
+                // Krok 2: Jeśli region nie należy do głównych stref lub baza jest pusta, pobierz hity z otwartego API SHOUTcast/Icecast
+                if (stations.length === 0 && countryCode) {
+                    const radioRes = await fetch(`https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/${countryCode}?order=clickcount&reverse=true&limit=150`);
+                    const apiData = await radioRes.json();
+                    stations = filterBestStations(apiData);
+                }
+
+                // Krok 3: Wyświetl wszystkie znalezione stacje (dokładnie tyle ile ich jest, styl YouTube)
+                renderList(stations, document.getElementById('resList'));
+
+            } catch(e) {
+                console.log("Błąd sieci. Ładuję plan awaryjny.");
+                renderList(getPremiumVerifiedStations("DE", "Pfalz"), document.getElementById('resList'));
+            }
+        }
+
+        async function search() {
+            const q = document.getElementById('sIn').value;
+            if (!q || q.trim() === '') return;
+            
+            document.getElementById('mainListTitle').innerText = `RESULTS`;
+            try {
+                const res = await fetch(`https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(q)}`);
+                const data = await res.json();
+                renderList(filterBestStations(data), document.getElementById('resList'));
+            } catch(e) {}
+        }
+
+        function renderList(data, container) {
+            container.innerHTML = '';
+            
+            if (data.length === 0) {
+                container.innerHTML = `<div style="padding:10px; opacity:0.5; font-size:13px;">No live stations found...</div>`;
+                return;
+            }
+
+            data.forEach(s => {
+                const isF = favs.some(f => f.stationuuid === s.stationuuid);
+                const isPlaying = s.stationuuid === currentStationUuid;
+                
+                const div = document.createElement('div');
+                div.className = `item ${isPlaying ? 'playing-now' : ''}`;
+                div.setAttribute('data-uuid', s.stationuuid);
+                
+                let iconHTML = `<div class="item-icon">📻</div>`;
+                if(s.favicon && s.favicon.trim() !== '') {
+                    iconHTML = `<div class="item-icon"><img src="${s.favicon}" onerror="this.parentElement.innerHTML='📻'"></div>`;
+                }
+                
+                div.innerHTML = `${iconHTML}<div style="flex:1; overflow:hidden"><b>${s.name}</b></div><div class="star ${isF?'active':''}" onclick="event.stopPropagation(); toggleFav(${JSON.stringify(s).replace(/"/g, '&quot;')})">★</div>`;
+                div.onclick = () => play(s);
+                container.appendChild(div);
+            });
+        }
+
+        function play(s) {
+            currentStationUuid = s.stationuuid;
+            currentStationName = s.name;
+            currentStationFavicon = s.favicon;
+            
+            document.querySelectorAll('.item').forEach(el => {
+                if(el.getAttribute('data-uuid') === currentStationUuid) {
+                    el.classList.add('playing-now');
+                } else {
+                    el.classList.remove('playing-now');
+                }
+            });
+
+            const mainIconBox = document.getElementById('mainIconBox');
+            if (s.favicon && s.favicon.trim() !== '') {
+                mainIconBox.innerHTML = `<img src="${s.favicon}" onerror="this.parentElement.innerHTML='<span class=\'emoji-fallback\'>📻</span>'">`;
+            } else {
+                mainIconBox.innerHTML = `<span class="emoji-fallback">📻</span>`;
+            }
+
+            if (!isIOS) audio.volume = volSlider.value;
+
+            let streamUrl = s.url;
+            if (streamUrl.startsWith('http://')) {
+                streamUrl = streamUrl.replace('http://', 'https://');
+            }
+
+            audio.src = streamUrl;
+            pBtn.innerText = '⏸';
+
+            audio.play().then(() => {
+                updateMediaSession(currentStationName, currentStationFavicon);
+            }).catch((err) => { 
+                audio.src = s.url;
+                if (!isIOS) audio.volume = volSlider.value;
+                audio.play().then(() => {
+                    pBtn.innerText = '⏸';
+                    updateMediaSession(currentStationName, currentStationFavicon);
+                }).catch(e => console.log("Stream Error:", e));
+            });
+            document.getElementById('curName').innerText = s.name;
+        }
+
+        function togglePlay() {
+            if (audio.paused) { 
+                audio.play().then(() => {
+                    pBtn.innerText = '⏸'; 
+                    updateMediaSession(currentStationName, currentStationFavicon);
+                });
+            } else { 
+                audio.pause(); 
+                pBtn.innerText = '▶'; 
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+            }
+        }
+
+        function toggleFav(s) {
+            const idx = favs.findIndex(f => f.stationuuid === s.stationuuid);
+            if (idx === -1) favs.push(s);
+            else favs.splice(idx, 1);
+            localStorage.setItem('RADIO_STATIONS_FINAL', JSON.stringify(favs));
+            renderFavs();
+        }
+
+        if (!isIOS) {
+            volSlider.addEventListener('input', (e) => {
+                audio.volume = e.target.value;
+            });
+        }
+
+        function changeVolumeStep(step) {
+            if (isIOS) return;
+            let newVal = parseFloat(volSlider.value) + step;
+            if (newVal > 1) newVal = 1;
+            if (newVal < 0) newVal = 0;
+            volSlider.value = newVal.toFixed(2);
+            audio.volume = newVal;
+        }
+
+        function renderFavs() { renderList(favs, document.getElementById('favList')); }
+        window.onload = () => { 
+            checkWelcomeMessage();
+            renderFavs(); 
+            loadInitialLocationStations();
+            canvas.width = canvas.offsetWidth; 
+            canvas.height = canvas.offsetHeight; 
+            drawStaticLine(); 
+        };
+    </script>
+</body>
+</html>
